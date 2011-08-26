@@ -1,3 +1,4 @@
+set.seed(141079)
 library(ggplot2)
 library(nullabor)
 load("lal.rdata")
@@ -31,54 +32,24 @@ threept <- transform(threept,
 threept <- subset(threept, r > 20 & r < 39)
 
 qplot(x, y, data = threept) + coord_equal()
+ggsave("x-y.pdf", width = 6, height = 4)
 qplot(angle, r, data = threept)
+ggsave("angle-r.pdf", width = 6, height = 4)
 
 qplot(angle * 180 / pi, r, data = threept, alpha = I(1/3)) +
   scale_x_continuous("Angle (degrees)",  breaks = c(0, 45, 90, 135, 180),
     limits = c(0, 180))
 
 last_plot() %+% 
-  lineup(null_model(r ~ poly(angle, 2)), threept, n = 10, pos = 5) + 
+  lineup(null_model(r ~ poly(angle, 2)), threept, n = 10, pos = 7) + 
   facet_wrap(~ .sample, ncol = 5)
+ggsave("quadratic.pdf", width = 8, height = 3)
+
+last_plot() %+% 
+  lineup(null_model(r ~ angle * (angle < pi / 2)), threept, n = 10, pos = 3) + 
+  facet_wrap(~ .sample, ncol = 5)
+ggsave("broken-stick.pdf", width = 8, height = 3)
+
 
 # Doesn't seem to be any relationship between success and radius or distance
 # that I can find.
-
-# Jump: 2114 points ---------------------------------------------------------
-jump <- subset(top, type == "jump")
-
-qplot(x, y, data = jump) + coord_equal()
-qplot(x, y, data = jump, geom = "jitter") + coord_equal()
-
-ggplot(jump, aes(x, y)) + 
-  geom_jitter(colour = "grey70") + 
-  geom_density2d()  + 
-  coord_equal()
-ggsave("13-jump-jitter-density.pdf", width = 8, height = 6)
-qplot(x, y, data = jump, geom = "density2d") + coord_equal()
-ggsave("13-jump-density.pdf", width = 8, height = 6)
-
-qplot(x, y, data = jump, geom = "density2d") + 
-  facet_wrap(~ result) + 
-  coord_equal()
-ggsave("13-jump-density-result.pdf", width = 8, height = 6)
-
-jump$x5 <- cut_interval(jump$x, length = 10)
-jump$y5 <- cut_interval(jump$y, length = 5)
-qplot(x, data = jump, binwidth = 1) + facet_wrap(~ y5)
-ggsave("13-jump-x-given-y.pdf", width = 8, height = 6)
-
-qplot(x, y, data = jump, geom = "density2d") + coord_equal() +
-  geom_vline(xintercept = 0:5 * 10) + xlim(0, 50) + ylim(0, 30)
-ggsave("13-jump-x-given-y2.pdf", width = 8, height = 6)
-qplot(x, y, data = jump, geom = "density2d") + coord_equal() +
-  geom_hline(yintercept = 0:6 * 5) + xlim(0, 50) + ylim(0, 30)
-ggsave("13-jump-y-given-x2.pdf", width = 8, height = 6)
-
-
-qplot(y, data = jump, binwidth = 1) + facet_wrap(~ x5)
-ggsave("13-jump-y-given-x.pdf", width = 8, height = 6)
-
-jump$dist <- with(jump, sqrt((x - 25)^2 + y^2))
-qplot(dist, data = jump, binwidth = 1)
-

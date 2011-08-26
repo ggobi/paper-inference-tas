@@ -42,7 +42,8 @@ scoring <- subset(scoring, !is.na(dur))
 qplot(dur, ..density.., data = scoring, binwidth = 5, geom = "histogram") %+%
   lineup(distribution("dur", "exponential"), n = 10) + 
   scale_y_continuous("Proportion") +
-  facet_wrap(~ .sample, ncol = 5)
+  facet_wrap(~ .sample, ncol = 5) + 
+  scale_x_continuous("", limits = c(-10, 300), breaks = 0:3 * 100)
 ggsave("exponential.pdf", width = 8, height = 3)
 
 # What if we removed free throws? 
@@ -55,7 +56,8 @@ fg <- subset(fg, !is.na(dur))
 qplot(dur, ..density.., data = fg, binwidth = 5, geom = "histogram") %+%
   lineup(distribution("dur", "gamma"), n = 10) +
   facet_wrap(~ .sample, ncol = 5) + 
-  ylab("Proportion")
+  ylab("Proportion") + 
+  scale_x_continuous("", limits = c(-10, 300), breaks = 0:3 * 100)
 ggsave("gamma.pdf", width = 8, height = 3)
 
 fitdistr(fg$dur, "gamma")$estimate
